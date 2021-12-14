@@ -1,12 +1,14 @@
-/*! Swipebox v1.4.4 | Constantin Saguin csag.co | MIT License | github.com/brutaldesign/swipebox */
+
+/*@preserve! Swipebox v1.4.4 | Constantin Saguin csag.co | MIT License | github.com/brutaldesign/swipebox @endpreserve*/
 /*
 	With fixes from PR
 	https://github.com/brutaldesign/swipebox/pull/324
 	https://github.com/brutaldesign/swipebox/pull/298
 	https://github.com/brutaldesign/swipebox/pull/287
 	and issue
-	https://github.com/brutaldesign/swipebox/issues/243
+	https://github.com/brutaldesign/swipebox/issues/243	
 */
+
 "use strict";
 ;( function ( window, document, $, undefined ) {
 
@@ -759,13 +761,18 @@
 			 */
 			setTitle : function ( index ) {
 				var title = null,
-					description = null;
+				description = null;
 
 				$( '#swipebox-title' ).empty();
 
 				if ( elements[ index ] !== undefined ) {
-					title = elements[ index ].title;
-					description = elements[ index ].description;
+					var location = decodeURI(elements[ index ].href); //link decoded do arquivo
+					var path = location.substring(0, location.lastIndexOf("/")); //path
+					var directoryName = path.substring(path.lastIndexOf("/") + 1); //nome da ultima pasta em que o arquivo está = nome do autor (ou quem enviou e assim quer ser chamado)
+					var fileName = location.substring(location.lastIndexOf("/")+1); //nome da arte (nome do arquivo)
+					
+					title = fileName + " by " + directoryName;
+					description = directoryName + " | " + fileName;
 				}
 
 				
