@@ -18,7 +18,9 @@
 
 {{ $margins := .Get "margins" | default (.Site.Params.galleryRowMargins | default 5) }}
 
-{{ $resizeOptions := .Get "resizeOptions" | default (.Site.Params.galleryResizeOptions | default "300x150 q85 Lanczos") }}
+{{ $thumbnailResizeOptions := .Get "thumbnailResizeOptions" | default (.Site.Params.galleryThumbnailResizeOptions | default "300x150 q85 Lanczos") }}
+
+{{ $imageResizeOptions := .Get "imageResizeOptions" | default .Site.Params.galleryImageResizeOptions }}
 
 {{ $loadJQuery := .Get "loadJQuery" | default (.Site.Params.galleryLoadJQuery | default false) }}
 
@@ -105,7 +107,7 @@ Ordinal: {{ .Ordinal}}
 			{{ end }}
 
 
-			{{/* Compute rotation to correct orientation of thumbnail in case the exif contains a value for orientation. See issue #22. */}}
+			{{/* Compute rotation to correct orientation of thumbnail (and downscaled gallery images) in case the exif contains a value for orientation. See issue #22. */}}
 			{{ $rotation := "" }}
 			{{ with $metadata.Orientation }}
 				{{/* Exif orientation is explained here: https://www.impulseadventure.com/photo/exif-orientation.html */}}
@@ -125,11 +127,18 @@ Ordinal: {{ .Ordinal}}
 			{{ end }}
 
 			{{/* Create thumbnail, rotate it if needed */}}
-			{{ $thumbnail := ($original.Fit (printf "%s %s" $resizeOptions $rotation)) }}
+			{{ $thumbnail := ($original.Fit (printf "%s %s" $thumbnailResizeOptions $rotation)) }}
 
 
 			<div>
-				<a href="{{ $original.RelPermalink }}" 
+				{{ $full := "" }}
+				{{ if $imageResizeOptions }}
+					{{/* Downscale gallery image, rotate it if needed */}}
+					{{ $full = ($original.Fit (printf "%s %s" $imageResizeOptions $rotation)) }}
+				{{ else }}
+					{{ $full = $original }}
+				{{ end }}
+				<a href="{{ $full.RelPermalink }}" 
 					class="galleryImg"
 					{{ with $metadata }}
 						{{ if .Title }}
